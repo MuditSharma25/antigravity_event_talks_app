@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Hub - Live Feed & Sharing</title>
+    <meta name="description" content="Explore, filter, and share Google Cloud BigQuery release notes instantly. Customize your updates and share them on Twitter with our integrated composer.">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar: Tweet Composer & Controls -->
+        <aside class="sidebar" id="sidebar-panel">
+            <div class="sidebar-header">
+                <div class="app-logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#logo-grad-1)"/>
+                        <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="url(#logo-grad-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logo-grad-1" x1="2" y1="2" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#00f2fe"/>
+                                <stop offset="1" stop-color="#4facfe"/>
+                            </linearGradient>
+                            <linearGradient id="logo-grad-2" x1="2" y1="12" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#4facfe"/>
+                                <stop offset="1" stop-color="#00f2fe"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span>BigQuery Hub</span>
+                </div>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Composer Widget -->
+                <section class="composer-widget" aria-labelledby="composer-heading">
+                    <h2 id="composer-heading" class="section-title">Tweet Composer</h2>
+                    <p class="composer-subtitle">Customize and share the selected update</p>
+                    
+                    <div class="composer-card">
+                        <div class="composer-card-header">
+                            <span class="composer-card-badge" id="composer-selected-badge">No Update Selected</span>
+                            <span class="composer-card-date" id="composer-selected-date"></span>
+                        </div>
+                        <div class="textarea-container">
+                            <textarea 
+                                id="tweet-textarea" 
+                                placeholder="Select an update from the feed to compose a tweet..." 
+                                aria-label="Tweet text content"
+                                rows="6"
+                            ></textarea>
+                            <div class="char-counter-container">
+                                <span id="char-counter" class="char-counter">0 / 280</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Auto-format Controls -->
+                        <div class="composer-controls">
+                            <span class="controls-label">Include Elements:</span>
+                            <div class="toggles-grid">
+                                <label class="toggle-container" for="toggle-date">
+                                    <input type="checkbox" id="toggle-date" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-text">Date</span>
+                                </label>
+                                <label class="toggle-container" for="toggle-link">
+                                    <input type="checkbox" id="toggle-link" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-text">Link</span>
+                                </label>
+                                <label class="toggle-container" for="toggle-tags">
+                                    <input type="checkbox" id="toggle-tags" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-text">Hashtags</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Tweet Action Button -->
+                        <button id="tweet-submit-btn" class="btn btn-primary" disabled>
+                            <svg class="twitter-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                            <span>Tweet Update</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Help/About Card -->
+                <div class="info-card">
+                    <h3>How it works</h3>
+                    <ol>
+                        <li>Browse the live BigQuery release notes.</li>
+                        <li>Use the filter and search tools to find topics.</li>
+                        <li>Click <strong>"Select for Tweet"</strong> on any card to populate the editor.</li>
+                        <li>Refine the text and post directly to X/Twitter!</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <p>&copy; 2026 BigQuery Release Hub</p>
+            </div>
+        </aside>
+
+        <!-- Main Feed Area -->
+        <main class="main-content">
+            <!-- Header Section -->
+            <header class="feed-header">
+                <div class="header-title-area">
+                    <h1>BigQuery Release Notes</h1>
+                    <p class="header-subtitle">Live stream of official product updates, features, and fixes</p>
+                </div>
+                
+                <!-- Refresh Button & Spinner -->
+                <button id="refresh-btn" class="btn btn-secondary" aria-label="Refresh release notes feed">
+                    <svg id="refresh-icon" class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                    </svg>
+                    <span>Refresh</span>
+                </button>
+            </header>
+
+            <!-- Search and Filter Bar -->
+            <section class="filter-bar" aria-label="Search and Filter releases">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Search updates (e.g. vector, JSON, assist)..." 
+                        aria-label="Search release notes"
+                    >
+                    <button id="search-clear-btn" class="search-clear-btn" aria-label="Clear search" style="display: none;">
+                        &times;
+                    </button>
+                </div>
+
+                <div class="filter-badges-container">
+                    <span class="filter-label">Filter by type:</span>
+                    <div class="filter-badges" id="filter-badges-list">
+                        <button class="badge-btn active" data-type="all">All</button>
+                        <button class="badge-btn" data-type="Feature">Feature</button>
+                        <button class="badge-btn" data-type="Changed">Changed</button>
+                        <button class="badge-btn" data-type="Deprecated">Deprecated</button>
+                        <button class="badge-btn" data-type="Issue">Issue</button>
+                        <button class="badge-btn" data-type="Update">Other</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feed Status / Info Alert -->
+            <div id="feed-status" class="feed-status-alert" style="display: none;">
+                <span class="status-dot"></span>
+                <span id="feed-status-text">Fetching latest updates...</span>
+            </div>
+
+            <!-- Release Notes List Container -->
+            <section id="notes-container" class="notes-container" aria-label="Release note items">
+                <!-- Skeleton Loader -->
+                <div class="skeleton-card">
+                    <div class="skeleton-header">
+                        <div class="skeleton-date"></div>
+                        <div class="skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line short"></div>
+                    <div class="skeleton-footer"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-header">
+                        <div class="skeleton-date"></div>
+                        <div class="skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line short"></div>
+                    <div class="skeleton-footer"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-header">
+                        <div class="skeleton-date"></div>
+                        <div class="skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line short"></div>
+                    <div class="skeleton-footer"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Main JavaScript -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
